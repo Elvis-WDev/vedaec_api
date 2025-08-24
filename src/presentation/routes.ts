@@ -1,17 +1,14 @@
-import { Router } from 'express';
-import { Authroutes } from './auth/routes';
+import { Router } from "express";
+import { CategoryRoutes, ProductRoutes } from "@/presentation";
 
 export class AppRoutes {
+  static get routes(): Router {
+    const router = Router();
 
-    static get routes(): Router {
+    // Definir las rutas
+    router.use("/api/categories", CategoryRoutes.routes);
+    router.use("/api/products", ProductRoutes.routes);
 
-        const router = Router();
-
-        // Definir las rutas
-        router.use('/api/auth', Authroutes.routes);
-
-        return router;
-    }
-
-
+    return router;
+  }
 }

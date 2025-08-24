@@ -1,25 +1,77 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("POSTGRES_URL")
+  provider = "mysql" // o el que corresponda a tu BD
+  url      = env("MYSQL_URI")
 }
 
-model User {
-    id             Int     @id @default(autoincrement())
-    name           String
-    email          String  @unique
-    emailValidated Boolean @default(false)
-    password       String
-    img            String?
-    role           Role[]  @default([USER_ROLE])
-
-    @@map("users")
+model categorias {
+  id_category Int         @id @default(autoincrement())
+  categoria   String      @db.Text
+  fecha       DateTime    @default(now()) @db.Timestamp(0)
+  productos   productos[]
 }
 
-enum Role {
-    ADMIN_ROLE
-    USER_ROLE
+model clientes {
+  id_cliente               Int       @id @default(autoincrement())
+  nombre_cliente           String    @db.Text
+  documento_cliente        String?   @db.Text
+  email_cliente            String?   @db.Text
+  telefono_cliente         String?   @db.Text
+  direccion_cliente        String?   @db.Text
+  fecha_nacimiento_cliente DateTime? @db.Date
+  compras_cliente          Int?
+  ultima_compra            DateTime? @db.DateTime(0)
+  fecha_cliente            DateTime  @default(now()) @db.Timestamp(0)
+  ventas                   ventas[]
+}
+
+model productos {
+  id_producto            Int        @id @default(autoincrement())
+  id_category            Int
+  codigo_producto        String     @db.Text
+  descripcion_producto   String     @db.Text
+  url_img_producto       String?    @db.Text
+  stock_producto         Int?
+  precio_compra_producto Float      @db.Float
+  precio_venta_producto  Float      @db.Float
+  ventas_producto        Int?
+  fecha                  DateTime   @default(now()) @db.Timestamp(0)
+  categorias             categorias @relation(fields: [id_category], references: [id_category], onDelete: Cascade, map: "productos_ibfk_1")
+
+  @@index([id_category], map: "id_category")
+}
+
+model usuarios {
+  id_usuario           Int       @id @default(autoincrement())
+  nombre_usuario       String?   @db.Text
+  usuario              String    @db.Text
+  password_usuario     String    @db.Text
+  perfil_usuario       String    @db.Text
+  foto_usuario         String    @db.Text
+  estado_usuario       Int       @default(1)
+  ultimo_login_usuario DateTime? @db.DateTime(0)
+  fecha_usuario        DateTime  @default(now()) @db.Timestamp(0)
+  ventas               ventas[]
+}
+
+model ventas {
+  id_venta        Int      @id @default(autoincrement())
+  codigo_venta    Int
+  id_cliente      Int
+  id_vendedor     Int
+  productos_venta String   @db.Text
+  impuesto_venta  Float    @db.Float
+  neto_venta      Float    @db.Float
+  total           Float    @db.Float
+  metodo_pago     String   @db.Text
+  fecha           DateTime @default(now()) @db.Timestamp(0)
+  clientes        clientes @relation(fields: [id_cliente], references: [id_cliente], onDelete: Cascade, map: "ventas_ibfk_1")
+  usuarios        usuarios @relation(fields: [id_vendedor], references: [id_usuario], onDelete: Cascade, map: "ventas_ibfk_2")
+
+  @@index([id_cliente], map: "id_cliente")
+  @@index([id_vendedor], map: "id_vendedor")
 }

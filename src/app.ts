@@ -1,24 +1,20 @@
-import { envs } from './config/envs';
-import { prisma } from './data';
-import { AppRoutes } from './presentation/routes';
-import { Server } from './presentation/server';
-
+import { envs } from "@/config";
+import { prisma } from "@/data";
+import { AppRoutes, Server } from "@/presentation";
 
 (async () => {
-    main();
+  main();
 })();
 
 async function main() {
+  // PostgreSQL connection
+  await prisma.$connect();
 
-    // PostgreSQL connection
-    await prisma.$connect();
+  // Starting server
+  const server = new Server({
+    port: envs.PORT,
+    routes: AppRoutes.routes,
+  });
 
-    // Starting server
-    const server = new Server({
-        port: envs.PORT,
-        routes: AppRoutes.routes,
-    });
-
-    server.start();
+  server.start();
 }
-

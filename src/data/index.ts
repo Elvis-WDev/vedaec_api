@@ -1,1 +1,1 @@
-export * from './postgreSQL/postgres-client'
+export * from "./MySQL/mysql-client";
